@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local environment files
+.env
+.env.*
+
+# Database volumes
+pgdata/
+
+# Flutter build artifacts
+.dart_tool/
+.packages
+build/
+*.patched
