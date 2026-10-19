@@ -9,6 +9,13 @@ app = FastAPI(title="India FinTech Core Ingestion Gateway")
 
 # 1. Define Explicit Allowed Origins matching industry security standards
 # In production environments, replace localhost strings with your verified organizational domains.
+
+#Project Architecture Verification Walkthrough
+
+#With this middleware in place, your entire Indian Salaried FinTech Accounting application stack is now connected and operational:
+#1. React Web UI (:3000) securely transmits a raw banking text notification via an authenticated POST request.
+#2. FastAPI Server (:8000) screens the request header, matches origin parameters, parses the complex text into double-entry components, and streams the structured payload instantly back onto the screen dashboard layout.
+
 origins = [
     "http://localhost:3000",     # React Web Dashboard (Development Local server)
     "http://127.0.0.1:3000",   # Fallback localhost address resolution
