@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  api_gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fintech_api_gateway
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://fintech_admin:SecurePass2026_##@db:5432/fintech_ledger
+      - REDIS_URL=redis://redis_broker:6379/0
+      - AA_SANDBOX_MODE=false
+      - TAX_YEAR=2026
+    depends_on:
+      - db
+      - redis_broker
+    networks:
+      - fintech_secure_network
+
+  async_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fintech_async_worker
+    command: celery -A tasks worker --loglevel=info
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://fintech_admin:SecurePass2026_##@db:5432/fintech_ledger
+      - REDIS_URL=redis://redis_broker:6379/0
+    depends_on:
+      - redis_broker
+      - db
+    networks:
+      - fintech_secure_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: fintech_postgres_db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=fintech_admin
+      - POSTGRES_PASSWORD=SecurePass2026_##
+      - POSTGRES_DB=fintech_ledger
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - fintech_secure_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fintech_admin -d fintech_ledger"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis_broker:
+    image: redis:7-alpine
+    container_name: fintech_redis_broker
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - fintech_secure_network
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  fintech_secure_network:
+    driver: bridge
